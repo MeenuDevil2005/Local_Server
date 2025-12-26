@@ -22,6 +22,21 @@ body{
 .header h1{color:#22c55e;margin:0;font-size:28px;}
 .header p{color:#cbd5f5;margin:6px 0 0;}
 
+/* ===== DRIVE BUTTON ===== */
+.drive-btn{
+  position:fixed;
+  top:16px;
+  right:35px;
+  background:#2563eb;
+  color:white;
+  padding:12px 22px;
+  border-radius:30px;
+  font-weight:bold;
+  text-decoration:none;
+  z-index:10000;
+  box-shadow:0 8px 25px rgba(37,99,235,0.45);
+}
+
 /* ===== CONTAINER ===== */
 .container{
   max-width:1200px;
@@ -30,7 +45,7 @@ body{
   text-align:center;
 }
 
-/* ===== FACE SCAN BOX ===== */
+/* ===== FACE SCAN ===== */
 .scan-box{
   width:180px;
   height:180px;
@@ -39,16 +54,6 @@ body{
   border-radius:18px;
   position:relative;
   overflow:hidden;
-  box-shadow:0 0 25px rgba(34,197,94,0.4);
-}
-.scan-box::before{
-  content:"🙂";
-  font-size:90px;
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  opacity:0.15;
 }
 .scan-line{
   position:absolute;
@@ -89,7 +94,7 @@ body{
   height:22px;
   max-width:540px;
   margin:20px auto;
-  background:linear-gradient(145deg,#020617,#0f172a);
+  background:#0f172a;
   border-radius:40px;
   overflow:hidden;
 }
@@ -106,7 +111,7 @@ body{
 
 /* ===== GALLERY ===== */
 .gallery{
-  display:none; /* 🔴 HIDDEN INITIALLY */
+  display:none;
   grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
   gap:24px;
 }
@@ -122,21 +127,17 @@ body{
   object-fit:cover;
   border-radius:12px;
 }
-.photo-card p{
-  font-size:13px;
-  margin-top:8px;
-  color:#d1d5db;
-}
 
 /* ===== MODAL ===== */
 .modal{
   display:none;
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.9);
+  background:rgba(0,0,0,0.92);
   justify-content:center;
   align-items:center;
   flex-direction:column;
+  z-index:20000;
 }
 .modal img{
   max-width:90%;
@@ -144,13 +145,30 @@ body{
   border-radius:14px;
   border:3px solid #22c55e;
 }
+
+/* ✅ FIXED CLOSE BUTTON */
 .close{
   position:absolute;
   top:20px;
-  right:30px;
-  font-size:40px;
+  right:25px;
+  font-size:32px;
+  color:white;
+  background:rgba(0,0,0,0.6);
+  border-radius:50%;
+  width:44px;
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   cursor:pointer;
+  z-index:30000;
+  transition:0.3s;
 }
+.close:hover{
+  background:#ef4444;
+  transform:scale(1.1);
+}
+
 .download{
   margin-top:18px;
   background:#22c55e;
@@ -158,11 +176,20 @@ body{
   padding:10px 22px;
   border-radius:10px;
   font-weight:bold;
+  text-decoration:none;
 }
 </style>
 </head>
 
 <body>
+
+<br>
+<a href="https://drive.google.com/drive/folders/1USZmk5mV9IY0ZapP-J0HeW4dFAbdDIxa"
+   target="_blank"
+   class="drive-btn">
+🔗 Google Drive (Open to copy this link)
+</a>
+<br>
 
 <div class="header">
   <h1>Digital Photo Archive with Face Recognition</h1>
@@ -170,7 +197,6 @@ body{
 </div>
 
 <div class="container">
-
   <h2>🔍 Face Scanning in Progress</h2>
 
   <div id="scanBox" class="scan-box">
@@ -192,6 +218,13 @@ body{
   <div class="gallery" id="gallery"></div>
 </div>
 
+<!-- MODAL -->
+<div id="modal" class="modal">
+  <span class="close" onclick="closeModal()">×</span>
+  <img id="modalImg">
+  <a id="downloadBtn" class="download" download>⬇ Download</a>
+</div>
+
 <script>
 const gallery = document.getElementById("gallery");
 const bar = document.getElementById("progressBar");
@@ -202,27 +235,21 @@ const scanBox = document.getElementById("scanBox");
 let progress = 0;
 let photosData = [];
 
-/* STEP 1: FETCH PHOTOS (DON'T SHOW YET) */
 fetch("/load_photos")
 .then(r=>r.json())
-.then(data=>{
-  photosData = data.photos;
-});
+.then(data=>photosData=data.photos);
 
-/* STEP 2: PROGRESS ANIMATION */
-let loader = setInterval(()=>{
-  if(progress < 100){
+let loader=setInterval(()=>{
+  if(progress<100){
     progress++;
-    bar.style.width = progress + "%";
-    bar.textContent = progress + "%";
+    bar.style.width=progress+"%";
+    bar.textContent=progress+"%";
   }else{
     clearInterval(loader);
-
-    /* STEP 3: SHOW CONTENT AFTER PROGRESS */
-    scanBox.style.display = "none";
-    greeting.style.display = "block";
-    faceBtn.style.display = "inline-block";
-    gallery.style.display = "grid";
+    scanBox.style.display="none";
+    greeting.style.display="block";
+    faceBtn.style.display="inline-block";
+    gallery.style.display="grid";
 
     photosData.forEach(p=>{
       const card=document.createElement("div");
@@ -232,9 +259,8 @@ let loader = setInterval(()=>{
       gallery.appendChild(card);
     });
   }
-}, 40);
+},40);
 
-/* MODAL */
 function openModal(src,file){
   document.getElementById("modalImg").src=src;
   document.getElementById("downloadBtn").href="/download/"+file;
@@ -244,13 +270,6 @@ function closeModal(){
   document.getElementById("modal").style.display="none";
 }
 </script>
-
-<!-- MODAL HTML -->
-<div id="modal" class="modal">
-  <span class="close" onclick="closeModal()">×</span>
-  <img id="modalImg">
-  <a id="downloadBtn" class="download" download>⬇ Download</a>
-</div>
 
 </body>
 </html>
