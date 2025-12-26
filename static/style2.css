@@ -1,0 +1,96 @@
+/* style2.css - Photo result page */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(140deg, #071028, #020617);
+  color: #e8fff3;
+  min-height: 100vh;
+}
+
+.background {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at top, #081226, #020617);
+  z-index: -1;
+  opacity: 0.5;
+}
+
+.content {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 18px;
+}
+
+.instructions {
+  background: rgba(255,255,255,0.03);
+  padding: 14px 18px;
+  border-radius: 10px;
+  border-left: 4px solid #22c55e;
+  margin-bottom: 16px;
+}
+
+.instructions h4 {
+  margin: 0 0 8px 0;
+  color: #a7f3d0;
+}
+
+.found-text {
+  font-size: 22px;
+  margin-top: 8px;
+  text-align: center;
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.photo-name {
+  text-align: center;
+  color: #c6f7d1;
+  margin-top: 6px;
+  margin-bottom: 18px;
+}
+
+.photo-frame {
+  text-align: center;
+  margin: 18px 0;
+}
+
+.photo-frame img {
+  max-width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  border: 5px solid rgba(255,255,255,0.03);
+}
+
+.download-container {
+  text-align:center;
+  margin: 14px 0;
+}
+
+.download-btn {
+  background: linear-gradient(135deg,#22c55e,#1e7e34);
+  border: none;
+  color: #071028;
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(34,197,94,0.25);
+}
+
+.back-link {
+  display:inline-block;
+  color:#b6f8d7;
+  text-decoration:none;
+  margin-top:12px;
+}
+
+.error {
+  color: #ffb4b4;
+  text-align: center;
+  font-weight: 700;
+}

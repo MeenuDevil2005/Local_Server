@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instructions</title>
+  <link rel="stylesheet" href="/static/style.css" />
+
+  <style>
+    /* Allow page scrolling */
+    body {
+      overflow-y: auto !important;
+    }
+
+    /* Center the full page content */
+    .overlay {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 40px 15px 40px; /* FIXED PADDING */
+      text-align: center;
+      min-height: 100vh;
+    }
+
+    /* Fullscreen popup */
+    .fullscreen-view {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .fullscreen-view img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 12px;
+      border: 3px solid white;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      font-size: 35px;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .single-example img {
+      cursor: pointer;
+      transition: transform .3s ease;
+    }
+
+    .single-example img:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="background"></div>
+
+  <div class="overlay">
+    <header>
+      <img src="/static/uploads/Office.png" alt="College Logo" class="logo" />
+      <h1 class="college-name">GOBI ARTS & SCIENCE COLLEGE</h1>
+      <hr class="divider">
+      <h2 class="sub-title">PHOTO SEARCH INSTRUCTIONS</h2>
+    </header>
+
+    <main class="instruction-box">
+      <h3>📌 Please Read Before Continuing</h3>
+
+      <ul>
+        <li>Stand in good lighting (avoid shadows).</li>
+        <li>Look straight into the camera with a normal expression.</li>
+        <li>Only one face should appear in the camera.</li>
+        <li>Upload a clear selfie OR use real-time camera search.</li>
+        <li>Wait for all photos to load (up to 100%).</li>
+      </ul>
+
+      <h3 style="margin-top:25px;">📸 Example Photo</h3>
+
+      <div class="single-example">
+        <img src="/static/example/example.jpg" onclick="openFull()" alt="Example Photo">
+        <p>This is how your selfie should look</p>
+      </div>
+
+      <!-- Continue Button Always Visible -->
+      <div style="margin-top: 25px;">
+        <a class="main-button" href="/user">CONTINUE >></a>
+      </div>
+    </main>
+  </div>
+
+  <!-- FULLSCREEN POPUP -->
+  <div class="fullscreen-view" id="fullscreenBox">
+      <span class="close-btn" onclick="closeFull()">×</span>
+      <img src="/static/example/example.jpg" id="fullImage">
+  </div>
+
+  <script>
+    function openFull() {
+      document.getElementById("fullscreenBox").style.display = "flex";
+    }
+    function closeFull() {
+      document.getElementById("fullscreenBox").style.display = "none";
+    }
+  </script>
+
+</body>
+</html>

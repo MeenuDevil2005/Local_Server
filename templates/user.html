@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Digital Photo Archive | College Face Recognition</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  background:#020617;
+  color:white;
+  font-family:Arial;
+  margin:0;
+}
+
+/* ===== HEADER ===== */
+.header{
+  border-bottom:1px solid #1f2933;
+  padding:24px;
+  text-align:center;
+}
+.header h1{color:#22c55e;margin:0;font-size:28px;}
+.header p{color:#cbd5f5;margin:6px 0 0;}
+
+/* ===== CONTAINER ===== */
+.container{
+  max-width:1200px;
+  margin:30px auto;
+  padding:20px;
+  text-align:center;
+}
+
+/* ===== FACE SCAN BOX ===== */
+.scan-box{
+  width:180px;
+  height:180px;
+  margin:20px auto;
+  border:3px solid #22c55e;
+  border-radius:18px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 0 25px rgba(34,197,94,0.4);
+}
+.scan-box::before{
+  content:"🙂";
+  font-size:90px;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  opacity:0.15;
+}
+.scan-line{
+  position:absolute;
+  top:-30%;
+  width:100%;
+  height:30%;
+  background:linear-gradient(to bottom,transparent,rgba(34,197,94,0.6),transparent);
+  animation:scanMove 2s linear infinite;
+}
+@keyframes scanMove{
+  0%{top:-30%}
+  100%{top:120%}
+}
+
+/* ===== GREETING ===== */
+.greeting{
+  display:none;
+  font-size:22px;
+  font-weight:bold;
+  color:#4ade80;
+  margin:18px 0;
+}
+
+/* ===== FACE SEARCH ===== */
+.center-face-btn{
+  display:none;
+  margin:20px auto 30px;
+  background:#22c55e;
+  color:black;
+  padding:14px 32px;
+  border-radius:40px;
+  font-weight:bold;
+  text-decoration:none;
+}
+
+/* ===== PROGRESS ===== */
+.progress{
+  height:22px;
+  max-width:540px;
+  margin:20px auto;
+  background:linear-gradient(145deg,#020617,#0f172a);
+  border-radius:40px;
+  overflow:hidden;
+}
+#progressBar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#16a34a,#4ade80,#22c55e);
+  color:#020617;
+  font-weight:bold;
+  font-size:13px;
+  line-height:22px;
+  border-radius:40px;
+}
+
+/* ===== GALLERY ===== */
+.gallery{
+  display:none; /* 🔴 HIDDEN INITIALLY */
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:24px;
+}
+.photo-card{
+  background:#111827;
+  padding:10px;
+  border-radius:14px;
+  cursor:pointer;
+}
+.photo-card img{
+  width:100%;
+  height:180px;
+  object-fit:cover;
+  border-radius:12px;
+}
+.photo-card p{
+  font-size:13px;
+  margin-top:8px;
+  color:#d1d5db;
+}
+
+/* ===== MODAL ===== */
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.9);
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+}
+.modal img{
+  max-width:90%;
+  max-height:85%;
+  border-radius:14px;
+  border:3px solid #22c55e;
+}
+.close{
+  position:absolute;
+  top:20px;
+  right:30px;
+  font-size:40px;
+  cursor:pointer;
+}
+.download{
+  margin-top:18px;
+  background:#22c55e;
+  color:black;
+  padding:10px 22px;
+  border-radius:10px;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>Digital Photo Archive with Face Recognition</h1>
+  <p>Gobi Arts & Science College</p>
+</div>
+
+<div class="container">
+
+  <h2>🔍 Face Scanning in Progress</h2>
+
+  <div id="scanBox" class="scan-box">
+    <div class="scan-line"></div>
+  </div>
+
+  <div id="greeting" class="greeting">
+    🎉 Scan Complete! Photos Loaded Successfully
+  </div>
+
+  <a href="/face_search" id="faceBtn" class="center-face-btn">
+    🧑 Face Search by Face Recognition
+  </a>
+
+  <div class="progress">
+    <div id="progressBar">0%</div>
+  </div>
+
+  <div class="gallery" id="gallery"></div>
+</div>
+
+<script>
+const gallery = document.getElementById("gallery");
+const bar = document.getElementById("progressBar");
+const faceBtn = document.getElementById("faceBtn");
+const greeting = document.getElementById("greeting");
+const scanBox = document.getElementById("scanBox");
+
+let progress = 0;
+let photosData = [];
+
+/* STEP 1: FETCH PHOTOS (DON'T SHOW YET) */
+fetch("/load_photos")
+.then(r=>r.json())
+.then(data=>{
+  photosData = data.photos;
+});
+
+/* STEP 2: PROGRESS ANIMATION */
+let loader = setInterval(()=>{
+  if(progress < 100){
+    progress++;
+    bar.style.width = progress + "%";
+    bar.textContent = progress + "%";
+  }else{
+    clearInterval(loader);
+
+    /* STEP 3: SHOW CONTENT AFTER PROGRESS */
+    scanBox.style.display = "none";
+    greeting.style.display = "block";
+    faceBtn.style.display = "inline-block";
+    gallery.style.display = "grid";
+
+    photosData.forEach(p=>{
+      const card=document.createElement("div");
+      card.className="photo-card";
+      card.onclick=()=>openModal(p.view_url,p.id);
+      card.innerHTML=`<img src="${p.view_url}"><p>${p.name}</p>`;
+      gallery.appendChild(card);
+    });
+  }
+}, 40);
+
+/* MODAL */
+function openModal(src,file){
+  document.getElementById("modalImg").src=src;
+  document.getElementById("downloadBtn").href="/download/"+file;
+  document.getElementById("modal").style.display="flex";
+}
+function closeModal(){
+  document.getElementById("modal").style.display="none";
+}
+</script>
+
+<!-- MODAL HTML -->
+<div id="modal" class="modal">
+  <span class="close" onclick="closeModal()">×</span>
+  <img id="modalImg">
+  <a id="downloadBtn" class="download" download>⬇ Download</a>
+</div>
+
+</body>
+</html>
